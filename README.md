@@ -1,5 +1,8 @@
 # Erc20 Token Example
 
+## TokenAddress
+0xd8BbB0d1A987541e75335CE12FFf7Fb8C33eA542
+
 ## Installation
 Clone the repository using the following command:
 Install the dependencies using the following command:
