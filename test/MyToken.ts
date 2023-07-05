@@ -53,8 +53,6 @@ describe("MyToken contract", function () {
       const recipientAddress = user1.address;
       const transferAmount = ethers.utils.parseEther("0.5");
 
-      const prevSenderBalance = await myToken.balanceOf(senderAddress);
-
       await myToken.connect(owner).approve(recipientAddress, transferAmount);
       await myToken.connect(user1).transferFrom(senderAddress, recipientAddress, transferAmount);
 
@@ -63,6 +61,49 @@ describe("MyToken contract", function () {
       expect(senderBalance).to.equal(ethers.utils.parseEther("9.5"));
       expect(recipientBalance).to.equal(transferAmount);
     });
+
+    it("Transfer", async () => {
+      const sender = owner;
+      const recipient = user1;
+      const amount = ethers.utils.parseEther("0.5");
+  
+      await myToken.connect(sender).mint(sender.address, amount);
+  
+      const senderBalanceBefore = await myToken.balanceOf(sender.address);
+      const recipientBalanceBefore = await myToken.balanceOf(recipient.address);
+  
+      await myToken.connect(sender).transfer(recipient.address, amount);
+  
+      const senderBalanceAfter = await myToken.balanceOf(sender.address);
+      const recipientBalanceAfter = await myToken.balanceOf(recipient.address);
+  
+      expect(senderBalanceAfter).to.equal(senderBalanceBefore.sub(amount));
+      expect(recipientBalanceAfter).to.equal(recipientBalanceBefore.add(amount));
+    });
+  
+    it("Transfer from", async () => {
+      const ownerAddress = owner.address;
+      const spenderAddress = user1.address;
+      const recipientAddress = user2.address;
+      const approvalAmount = ethers.utils.parseEther("0.5");
+      const transferAmount = ethers.utils.parseEther("0.3");
+  
+      await myToken.connect(owner).mint(ownerAddress, approvalAmount);
+  
+      await myToken.connect(owner).approve(spenderAddress, approvalAmount);
+  
+      const spenderAllowanceBefore = await myToken.allowance(ownerAddress, spenderAddress);
+      const recipientBalanceBefore = await myToken.balanceOf(recipientAddress);
+  
+      await myToken.connect(user1).transferFrom(ownerAddress, recipientAddress, transferAmount);
+  
+      const spenderAllowanceAfter = await myToken.allowance(ownerAddress, spenderAddress);
+      const recipientBalanceAfter = await myToken.balanceOf(recipientAddress);
+  
+      expect(spenderAllowanceAfter).to.equal(spenderAllowanceBefore.sub(transferAmount));
+      expect(recipientBalanceAfter).to.equal(recipientBalanceBefore.add(transferAmount));
+    });
+  
 
     it("Burn", async () => {
       const burnerAddress = owner.address;
