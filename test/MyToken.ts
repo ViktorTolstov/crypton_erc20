@@ -31,13 +31,6 @@ describe("MyToken contract", function () {
   });
 
   describe("Contract logic", function () {
-    // async function deployFixture() {
-    //   const [owner, user1, user2] = await ethers.getSigners();
-    //   let customToken = await ethers.getContractFactory(NAME);
-    //   let token = await customToken.deploy(NAME, SYMBOL);
-    //   return {token, owner, user1, user2}
-    // }
-
     it("Mint", async () => {
       const userAddress = user1.address;
       const amount = ethers.utils.parseEther("1");
@@ -53,12 +46,14 @@ describe("MyToken contract", function () {
       const recipientAddress = user1.address;
       const transferAmount = ethers.utils.parseEther("0.5");
 
+      const senderBalanceBefore = await myToken.balanceOf(senderAddress);
+
       await myToken.connect(owner).approve(recipientAddress, transferAmount);
       await myToken.connect(user1).transferFrom(senderAddress, recipientAddress, transferAmount);
 
       const senderBalance = await myToken.balanceOf(senderAddress);
       const recipientBalance = await myToken.balanceOf(recipientAddress);
-      expect(senderBalance).to.equal(ethers.utils.parseEther("9.5"));
+      expect(senderBalance).to.equal(senderBalanceBefore.sub(transferAmount));
       expect(recipientBalance).to.equal(transferAmount);
     });
 
